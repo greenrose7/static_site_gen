@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from main import text_node_to_html_node
+from main import text_node_to_html_node, split_nodes_delimiter
 from leafnode import LeafNode
 
 
@@ -31,6 +31,7 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.ITALIC,)
         self.assertNotEqual(node1, node2)
 
+### text_node_to_html_node
     def test_text_node_to_html_bold(self):
         node1 = TextNode("This is a bold node", TextType.BOLD)
         node1 = text_node_to_html_node(node1)
@@ -58,6 +59,78 @@ class TestTextNode(unittest.TestCase):
     def test_text_node_to_html_incorrect_textype(self):
         node1 = TextNode("This is a bogus node", "texttype")
         self.assertRaises(Exception, text_node_to_html_node, node1)
+
+### split_nodes_delimiter
+    def test_split_nodes_single_bold(self):
+        node1 = TextNode("This text has **bold text** within", TextType.TEXT)
+        expected_output = [
+            TextNode("This text has ", TextType.TEXT),
+            TextNode("bold text", TextType.BOLD),
+            TextNode(" within", TextType.TEXT)
+        ]
+        self.assertEqual(split_nodes_delimiter([node1], "**", TextType.BOLD), expected_output)
+    
+    def test_split_nodes_single_italic(self):
+        node1 = TextNode("This text has *italic text* within", TextType.TEXT)
+        expected_output = [
+            TextNode("This text has ", TextType.TEXT),
+            TextNode("italic text", TextType.ITALIC),
+            TextNode(" within", TextType.TEXT)
+        ]
+        self.assertEqual(split_nodes_delimiter([node1], "*", TextType.ITALIC), expected_output)
+    
+    def test_split_nodes_single_code(self):
+        node1 = TextNode("This text has `code text` within", TextType.TEXT)
+        expected_output = [
+            TextNode("This text has ", TextType.TEXT),
+            TextNode("code text", TextType.CODE),
+            TextNode(" within", TextType.TEXT)
+        ]
+        self.assertEqual(split_nodes_delimiter([node1], "`", TextType.CODE), expected_output)
+
+    def test_split_nodes_multi_bold(self):
+        node1 = TextNode("This text has **multiple** different **bold texts** within", TextType.TEXT)
+        expected_output = [
+            TextNode("This text has ", TextType.TEXT),
+            TextNode("multiple", TextType.BOLD),
+            TextNode(" different ", TextType.TEXT),
+            TextNode("bold texts", TextType.BOLD),
+            TextNode(" within", TextType.TEXT)
+        ]
+        self.assertEqual(split_nodes_delimiter([node1], "**", TextType.BOLD), expected_output)
+    
+    def test_split_nodes_missing_close_delim(self):
+        node1 = TextNode("This text has **bold text with a missing close delim within", TextType.TEXT)
+        self.assertRaises(Exception, split_nodes_delimiter, [node1], "**", TextType.BOLD)
+    
+    def test_split_nodes_no_delim(self):
+        node1 = TextNode("This text has no delimiters!", TextType.TEXT)
+        expected_output = [TextNode("This text has no delimiters!", TextType.TEXT)]
+        self.assertEqual(split_nodes_delimiter([node1], "**", TextType.BOLD), expected_output)
+    
+    def test_split_nodes_sequential_bold_then_italic(self):
+        node1 = TextNode("This text has **bold text** then some *italic text* then **even more bold text!**", TextType.TEXT)
+        expected_output = [
+            TextNode("This text has ", TextType.TEXT),
+            TextNode("bold text", TextType.BOLD),
+            TextNode(" then some ", TextType.TEXT),
+            TextNode("italic text", TextType.ITALIC),
+            TextNode(" then ", TextType.TEXT),
+            TextNode("even more bold text!", TextType.BOLD)
+        ]
+        output = split_nodes_delimiter([node1], "**", TextType.BOLD)
+        output = split_nodes_delimiter(output, "*", TextType.ITALIC)
+
+        self.assertEqual(output, expected_output)
+    
+    def test_split_nodes_full_bold(self):
+        node1 = TextNode("**This text is all bold text**", TextType.TEXT)
+        expected_output = [
+            TextNode("This text is all bold text", TextType.BOLD)
+        ]
+        self.assertEqual(split_nodes_delimiter([node1], "**", TextType.BOLD), expected_output)
+
+
 
 if __name__ == "__main__":
     unittest.main()
