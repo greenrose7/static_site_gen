@@ -1,3 +1,5 @@
+import re
+
 from textnode import TextNode, TextType
 from leafnode import LeafNode
 
@@ -45,5 +47,26 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             new_nodes.extend(split_nodes_delimiter(split_nodes, delimiter, text_type))
     return new_nodes
 
+def extract_markdown_images(text):
+    found_patterns = re.findall(r"!\[.+?\]\(.+?\)", text)
+    if len(found_patterns) < 1:
+        return []
+    image_tuples = []
+    for pattern in found_patterns:
+        stripped = pattern.strip("![)]")
+        split = stripped.split("](")
+        image_tuples.append(tuple(split))
+    return image_tuples
+
+def extract_markdown_links(text):
+    found_patterns = re.findall(r"\[.+?\]\(.+?\)", text)
+    if len(found_patterns) < 1:
+        return []
+    link_tuples = []
+    for pattern in found_patterns:
+        stripped = pattern.strip("[)]")
+        split = stripped.split("](")
+        link_tuples.append(tuple(split))
+    return link_tuples
 
 main()
