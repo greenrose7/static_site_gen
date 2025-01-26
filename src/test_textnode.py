@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from main import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from main import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 from leafnode import LeafNode
 
 
@@ -140,6 +140,37 @@ class TestTextNode(unittest.TestCase):
         text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
         self.assertEqual(extract_markdown_links(text), [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")])
 
+### split_nodes_image (sni)
+    def test_sni(self):
+        node = TextNode(
+            "This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        expected_outcome = [
+            TextNode("This is text with a link ", TextType.TEXT),
+            TextNode("to boot dev", TextType.IMAGE, "https://www.boot.dev"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode(
+                "to youtube", TextType.IMAGE, "https://www.youtube.com/@bootdotdev"
+            ),
+        ]
+        self.assertEqual(split_nodes_image([node]), expected_outcome)
+
+### split_nodes_link (snl)
+    def test_snl(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        expected_outcome = [
+            TextNode("This is text with a link ", TextType.TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode(
+                "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+            ),
+        ]
+        self.assertEqual(split_nodes_link([node]), expected_outcome)
 
 if __name__ == "__main__":
     unittest.main()
