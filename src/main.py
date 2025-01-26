@@ -129,4 +129,20 @@ def text_to_textnodes(text):
     
     return text_nodes
 
+def markdown_to_blocks(markdown):
+    string_blocks = []
+    current_block = ""
+    for string in markdown.split("\n"):
+        if string != "":
+            if current_block != "":
+                current_block += "\n"
+            current_block += string
+        else:
+            if current_block != "":
+                string_blocks.append(current_block.strip(" "))
+                current_block = ""
+    if current_block != "":
+        string_blocks.append(current_block.strip(" "))
+    return string_blocks
+
 main()
