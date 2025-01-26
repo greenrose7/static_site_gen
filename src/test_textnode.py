@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from main import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from main import *
 from leafnode import LeafNode
 
 
@@ -142,7 +142,7 @@ class TestTextNode(unittest.TestCase):
 
 ### split_nodes_image (sni)
     def test_sni(self):
-        node = TextNode(
+        node1 = TextNode(
             "This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",
             TextType.TEXT,
         )
@@ -154,11 +154,11 @@ class TestTextNode(unittest.TestCase):
                 "to youtube", TextType.IMAGE, "https://www.youtube.com/@bootdotdev"
             ),
         ]
-        self.assertEqual(split_nodes_image([node]), expected_outcome)
+        self.assertEqual(split_nodes_image([node1]), expected_outcome)
 
 ### split_nodes_link (snl)
     def test_snl(self):
-        node = TextNode(
+        node1 = TextNode(
             "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
             TextType.TEXT,
         )
@@ -170,7 +170,57 @@ class TestTextNode(unittest.TestCase):
                 "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
             ),
         ]
-        self.assertEqual(split_nodes_link([node]), expected_outcome)
+        self.assertEqual(split_nodes_link([node1]), expected_outcome)
+
+### text_to_textnodes
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        expected_outcome = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected_outcome)
+    
+    def test_text_to_textnodes_one_space_gaps(self):
+        text = "**This is all bold text until it's an** ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) *and italic here between the* [link](https://boot.dev)"
+        expected_outcome = [
+            TextNode("This is all bold text until it's an", TextType.BOLD),
+            TextNode(" ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" ", TextType.TEXT),
+            TextNode("and italic here between the", TextType.ITALIC),
+            TextNode(" ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected_outcome)
+    
+    def test_text_to_textnodes_sequential_code(self):
+        text = "This is `one code block` then `another code block` `and another (crazy!)`"
+        expected_outcome = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("one code block", TextType.CODE),
+            TextNode(" then ", TextType.TEXT),
+            TextNode("another code block", TextType.CODE),
+            TextNode(" ", TextType.TEXT),
+            TextNode("and another (crazy!)", TextType.CODE),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected_outcome)
+    
+    def test_text_to_textnodes_no_changes(self):
+        text = "This is just one string of text with no markers"
+        expected_outcome = [
+            TextNode("This is just one string of text with no markers", TextType.TEXT),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected_outcome)
+    
 
 if __name__ == "__main__":
     unittest.main()
