@@ -1,7 +1,6 @@
 import unittest
-from parentnode import ParentNode
-from leafnode import LeafNode
-from markdownpageconverter import markdown_to_html_node
+from htmlnode import LeafNode, ParentNode
+from markdown_blocks import markdown_to_html_node
 
 class Testmarkdownpageconverter(unittest.TestCase):
     def test_markdownpageconverter(self):

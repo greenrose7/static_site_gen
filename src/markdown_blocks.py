@@ -1,7 +1,66 @@
-from main import markdown_to_blocks, block_to_block_type, text_to_textnodes, text_node_to_html_node
-from parentnode import ParentNode
-from leafnode import LeafNode
-from textnode import TextNode
+from inline_markdown import text_to_textnodes
+from htmlnode import ParentNode, LeafNode
+from textnode import text_node_to_html_node
+
+def markdown_to_blocks(markdown):
+    string_blocks = []
+    current_block = ""
+    for string in markdown.split("\n"):
+        if string != "":
+            if current_block != "":
+                current_block += "\n"
+            current_block += string
+        else:
+            if current_block != "":
+                string_blocks.append(current_block.strip(" "))
+                current_block = ""
+    if current_block != "":
+        string_blocks.append(current_block.strip(" "))
+    return string_blocks
+
+def block_to_block_type(markdown_text):
+    match markdown_text[0]:
+        case '#': #Headings
+            count = 0
+            while markdown_text[count] == '#' and count < 6: #counting num of #
+                count += 1
+            if markdown_text[count] == " ": #making sure next character is a space, else invalid
+                return f"heading{count}" 
+        
+        case '`': #Code
+            if markdown_text.startswith('```') and markdown_text.endswith('```'):
+                return "code"
+            
+        case '>': #Quote
+            split_text = markdown_text.split("\n")
+            all_quotes = True
+            for line in split_text:
+                if line[0] != '>':
+                    all_quotes = False
+            if all_quotes: return "quote"
+
+        case '*' | "-": #Unordered list
+            split_text = markdown_text.split("\n")
+            all_lists = True
+            for line in split_text:
+                if not line.startswith('* ') and not line.startswith('- '):
+                    all_lists = False
+            if all_lists: return "unorderedlist"
+
+        case '1': #Ordered list
+            split_text = markdown_text.split("\n")
+            all_lists = True
+            current_number = 1
+            for line in split_text:
+                if line.startswith(f"{current_number}. ") == False:
+                    all_lists = False
+                current_number += 1
+            if all_lists: return "orderedlist"
+
+        case _: #Normal Paragraph
+            pass
+    
+    return "paragraph" #additional catch all if case above doesn't meet secondary conditions
 
 def markdown_to_html_node(markdown):
     ## Split in to blocks
