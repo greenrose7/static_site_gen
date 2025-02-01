@@ -19,8 +19,8 @@ class HTMLNode():
     def __repr__(self):
         print(f"""
 HTMLNode:
-    tag: {self.tag}
-    value: {self.value}
+    tag: {self.tag} type: {type(self.tag)}
+    value: "{self.value}"
     children: {self.children}
     props: {self.props}
 """
@@ -29,6 +29,22 @@ HTMLNode:
     def __eq__(self, other):
         return (self.tag == other.tag and 
                 self.value == other.value and 
-                self.children == other.children and
+                self.compare_children(other) and
                 self.props == other.props
                 )
+    
+    def compare_children(self, other):
+        if self.children == None and other.children == None:
+            return True
+        if self.children == None and other.children != None:
+            return False
+        if self.children != None and other.children == None:
+            return False
+        if len(self.children) != len(other.children):
+            return False
+        same_children = True
+        for idx, val in enumerate(self.children):
+            if self.children[idx] != other.children[idx]:
+                same_children = False
+        return same_children
+
