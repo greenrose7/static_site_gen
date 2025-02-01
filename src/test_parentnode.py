@@ -3,7 +3,7 @@ import unittest
 from parentnode import ParentNode
 from leafnode import LeafNode
 
-class TestLeafNode(unittest.TestCase):
+class TestParentNode(unittest.TestCase):
     def test_eq(self):
         childnode1 = LeafNode("p", "this is a test child node", {"color": "blue"})
         childnode2 = LeafNode("b", "this is a test child node too!", {"color": "red"})
