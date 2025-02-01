@@ -145,4 +145,48 @@ def markdown_to_blocks(markdown):
         string_blocks.append(current_block.strip(" "))
     return string_blocks
 
+def block_to_block_type(markdown_text):
+    match markdown_text[0]:
+        case '#': #Headings
+            count = 0
+            while markdown_text[count] == '#' and count < 6: #counting num of #
+                count += 1
+            if markdown_text[count] == " ": #making sure next character is a space, else invalid
+                return f"heading{count}" 
+        
+        case '`': #Code
+            if markdown_text.startswith('```') and markdown_text.endswith('```'):
+                return "code"
+            
+        case '>': #Quote
+            split_text = markdown_text.split("\n")
+            all_quotes = True
+            for line in split_text:
+                if line[0] != '>':
+                    all_quotes = False
+            if all_quotes: return "quote"
+
+        case '*' | "-": #Unordered list
+            split_text = markdown_text.split("\n")
+            all_lists = True
+            for line in split_text:
+                if not line.startswith('* ') and not line.startswith('- '):
+                    all_lists = False
+            if all_lists: return "unorderedlist"
+
+        case '1': #Ordered list
+            split_text = markdown_text.split("\n")
+            all_lists = True
+            current_number = 1
+            for line in split_text:
+                if line.startswith(f"{current_number}. ") == False:
+                    all_lists = False
+                current_number += 1
+            if all_lists: return "orderedlist"
+
+        case _: #Normal Paragraph
+            pass
+    
+    return "paragraph" #additional catch all if case above doesn't meet secondary conditions
+
 main()
