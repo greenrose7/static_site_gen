@@ -22,16 +22,22 @@ def generate_page(from_path, template_path, dest_path):
         md_file = f.read()
     with open(template_path) as f:
         template_file = f.read()
-    print(f"md_file: {md_file}")
-    print(f"template_file: {template_file}")
     html_string = markdown_to_html_node(md_file).to_html()
-    print(f"html_string: {html_string}")
     title = extract_title(md_file)
-    print(f"title: {title}")
     template_file = template_file.replace("{{ Title }}", title)
     template_file = template_file.replace("{{ Content }}", html_string)
-    print(f"new template: {template_file}")
     if not path.exists(path.dirname(dest_path)):
         makedirs(path.dirname(dest_path))
     with open(dest_path, "w") as f:
         f.write(template_file)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in listdir(dir_path_content):
+        current_fullpath = path.join(dir_path_content, entry)
+        dest_fullpath = path.join(dest_dir_path, entry)
+        if path.isfile(current_fullpath):
+            dest_fullpath = dest_fullpath[:-3] + ".html"
+            print(f"Generating page from {current_fullpath} to {dest_fullpath}")
+            generate_page(current_fullpath, template_path, dest_fullpath)
+        else:
+            generate_pages_recursive(current_fullpath, template_path, dest_fullpath)
