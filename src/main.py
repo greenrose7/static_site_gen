@@ -1,11 +1,9 @@
 import re
-from file_handling import copy_contents
+from file_handling import copy_contents, generate_page
 
 def main():
-    #textnode = TextNode("This is dummy text", TextType.ITALIC, "http://google.com")
-    #print(textnode)
-    
+    #This first deletes the public directory    
     copy_contents("./static", "./public")
-    pass
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 main()
