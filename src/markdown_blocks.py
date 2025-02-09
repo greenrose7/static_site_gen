@@ -128,3 +128,11 @@ def text_to_leaf_nodes(text):
     for text_node in text_nodes:
         leaf_nodes.append(text_node_to_html_node(text_node))
     return leaf_nodes
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block_string in blocks:
+        if block_to_block_type(block_string) == "heading1":
+            return block_string.strip("# ")
+    raise Exception("No Header 1 Found")
+        

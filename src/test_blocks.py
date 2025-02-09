@@ -1,6 +1,6 @@
 import unittest
 
-from markdown_blocks import markdown_to_blocks, block_to_block_type
+from markdown_blocks import markdown_to_blocks, block_to_block_type, extract_title
 
 class TestBlocks(unittest.TestCase):
 ### markdown_to_blocks
@@ -180,6 +180,38 @@ There may be some stray characters > like these # ones
 1. It shouldn't stop it from being a paragraph
 * Still a paragraph'''
         self.assertEqual("paragraph", block_to_block_type(text))
+
+### extract title
+    def test_extract_title(self):
+        text = '''# This is a heading
+
+This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+* This is the first list item in a list block
+* This is a list item
+* This is another list item'''
+        expected_outcome = "This is a heading"
+        self.assertEqual(expected_outcome, extract_title(text))
+    
+    def test_extract_title_not_first(self):
+        text = '''This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+# This is a heading
+
+* This is the first list item in a list block
+* This is a list item
+* This is another list item'''
+        expected_outcome = "This is a heading"
+        self.assertEqual(expected_outcome, extract_title(text))
+    
+    def test_extract_title_no_header(self):
+        text = '''This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+* This is the first list item in a list block
+* This is a list item
+* This is another list item'''
+        with self.assertRaises(Exception):
+            extract_title(text)
 
 if __name__ == "__main__":
     unittest.main()
