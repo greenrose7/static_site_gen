@@ -111,14 +111,17 @@ def split_lists(list :str, ordered :bool = False, tag = "li"):
         nodes.append(ParentNode(tag, leaf_nodes))
     return nodes
 
-def clean_quote_syntax(text :str):
+def clean_quote_syntax(text :str, use_paragraphs = False):
     nodes = []
     for line in text.split("\n"):
         line = line[1:]
         line = line.lstrip(" ")
         if line != "":
             leaf_nodes = text_to_leaf_nodes(line)
-            nodes.append(ParentNode("p", leaf_nodes))
+            if use_paragraphs:
+                nodes.append(ParentNode("p", leaf_nodes))
+            else:
+                nodes.extend(leaf_nodes)
     return nodes
 
 

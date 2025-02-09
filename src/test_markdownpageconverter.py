@@ -124,9 +124,7 @@ alert(message);
                 LeafNode(None, "Blockquotes")
             ]),
             ParentNode("blockquote", [
-                ParentNode("p", [
-                    LeafNode(None, "Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz."),
-                ])
+                LeafNode(None, "Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz."),
             ]),
             ParentNode("h2", [
                 LeafNode(None, "Blocks of code")
@@ -164,9 +162,7 @@ alert(message);'''),
 <h2>Links</h2>
 <p>You may be using <a href="https://markdownlivepreview.com/">Markdown Live Preview</a>.</p>
 <h2>Blockquotes</h2>
-<blockquote>
-<p>Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.</p>
-</blockquote>
+<blockquote>Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.</blockquote>
 <h2>Blocks of code</h2>
 <pre><code>let message = 'Hello world';
 alert(message);
